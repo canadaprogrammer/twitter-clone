@@ -4,10 +4,10 @@
 
 - `npm i firebase`
 
-- Creating `firebase.js`
+- Creating `fbase.js`
 
   - ```js
-    import { initializeApp } from 'firebase/app';
+    import * as firebase from 'firebase/app';
 
     const firebaseConfig = {
       apiKey: 'AIza...',
@@ -18,12 +18,12 @@
       appId: '...',
     };
 
-    export default initializeApp(firebaseConfig);
+    export default firebase.initializeApp(firebaseConfig);
     ```
 
 - On `index.js`
 
-  - `import firebase from './firebase';`
+  - `import firebase from './fbase';`
 
 ## Securing the Keys
 
@@ -79,4 +79,40 @@
     }
 
     export default App;
+    ```
+
+## Set Absolute Imports
+
+- You can configure your application to support importing modules using absolute paths. This can be done by configuring a `jsconfig.json` or `tsconfig.json` file in the root of your project.
+
+  - on `jsconfig.json`
+
+    - ```json
+      {
+        "compilerOptions": {
+          "baseUrl": "src"
+        },
+        "include": ["src"]
+      }
+      ```
+
+  - Change import path
+
+## Using Firebase Auth
+
+- On `fbase.js`
+
+  - ```js
+    import { getAuth } from 'firebase/auth';
+
+    export const authService = getAuth();
+    ```
+
+- On `App.js`
+
+  - ```js
+    import { authService } from 'fbase';
+
+    function App() {
+      const [isLoggedIn, setIsLoggedIn] = useState(authService.currentUser);
     ```
