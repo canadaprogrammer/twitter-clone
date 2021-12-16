@@ -7,7 +7,7 @@
 - Creating `fbase.js`
 
   - ```js
-    import * as firebase from 'firebase/app';
+    import { initializeApp } from 'firebase/app';
 
     const firebaseConfig = {
       apiKey: 'AIza...',
@@ -18,12 +18,12 @@
       appId: '...',
     };
 
-    export default firebase.initializeApp(firebaseConfig);
+    export default initializeApp(firebaseConfig);
     ```
 
 - On `index.js`
 
-  - `import firebase from './fbase';`
+  - `import './fbase';`
 
 ## Securing the Keys
 
@@ -31,7 +31,7 @@
 
   - Environmental variables need to start with `REACT_APP_`.
 
-    - `REACT_APP_API_KEY=AIza...,`
+    - `REACT_APP_API_KEY=AIza...` // without `,` on the end of a line
 
 - On `firebase.js`
 
@@ -100,21 +100,13 @@
 
 ## Using Firebase Auth
 
-- On `fbase.js`
+- On `App.js`
 
   - ```js
     import { getAuth } from 'firebase/auth';
 
-    export const authService = getAuth();
-    ```
-
-- On `App.js`
-
-  - ```js
-    import { authService } from 'fbase';
-
     function App() {
-      const [isLoggedIn, setIsLoggedIn] = useState(authService.currentUser);
+      const [isLoggedIn, setIsLoggedIn] = useState(getAuth().currentUser);
     ```
 
 - Setting up Firebase Authentication
@@ -189,4 +181,39 @@
       );
     };
     export default Auth;
+    ```
+
+## Creating a New Account with Email and Password
+
+- On `Auth.js`
+
+  - ```jsx
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+    } from 'firebase/auth';
+
+    const Auth = () => {
+      ...
+      const [newAccount, setNewAccount] = useState(true);
+      ...
+      const onSubmit = async (evt) => {
+        evt.preventDefault();
+        try {
+          let data;
+          const auth = getAuth();
+          if (newAccount) {
+            data = await createUserWithEmailAndPassword(auth, email, password);
+          } else {
+            data = await signInWithEmailAndPassword(auth, email, password);
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      };
+      ...
+      return (
+        ...
+        <input type='submit' value={newAccount ? 'Create Account' : 'Log IN'} />
     ```
