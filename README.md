@@ -211,7 +211,7 @@
         {error}
     ```
 
-## Log In
+## Log In with Email and Password
 
 - On `App.js`
 
@@ -253,4 +253,48 @@
       <span onClick={toggleAccount}>
         {newAccount ? 'Sign In' : 'Create Account'}
       </span>
+    ```
+
+## Log In with Social
+
+- On `Auth.js`
+
+  - ```jsx
+    import {
+      ...
+      signInWithPopup,
+      GoogleAuthProvider,
+      GithubAuthProvider,
+    } from 'firebase/auth';
+
+    const Auth = () => {
+      ...
+      const onSocialClick = async (evt) => {
+        const {
+          target: { name },
+        } = evt;
+        let provider;
+        if (name === 'google') {
+          provider = new GoogleAuthProvider();
+        } else if (name === 'github') {
+          provider = new GithubAuthProvider();
+        }
+        try {
+          const data = await signInWithPopup(auth, provider);
+          console.log(data);
+        } catch (err) {
+          console.log(err);
+        }
+      };
+      return (
+        ...
+        <div>
+          <button onClick={onSocialClick} name='google'>
+            Continue with Google
+          </button>
+          <button onClick={onSocialClick} name='github'>
+            Continue with GitHub
+          </button>
+        </div>
+      );
     ```
