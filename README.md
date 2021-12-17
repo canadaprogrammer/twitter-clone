@@ -298,3 +298,70 @@
         </div>
       );
     ```
+
+## Log Out
+
+- Create `Navigation.js`
+
+  - ```jsx
+    import React from 'react';
+    import { Link } from 'react-router-dom';
+
+    const Navigation = () => (
+      <nav>
+        <ul>
+          <li>
+            <Link to='/'>Home</Link>
+          </li>
+          <li>
+            <Link to='/profile'>My Profile</Link>
+          </li>
+        </ul>
+      </nav>
+    );
+
+    export default Navigation;
+    ```
+
+- On `Router.js`
+
+  - ```jsx
+    const AppRouter = ({ isLoggedIn }) => {
+      return (
+        <Router>
+          {isLoggedIn && <Navigation />}
+          <Routes>
+            {isLoggedIn ? (
+              <Route path='/'>
+                <Route index element={<Home />} />
+                <Route path='profile' element={<Profile />} />
+              </Route>
+            ) : (
+              <Route path='/' element={<Auth />} />
+            )}
+          </Routes>
+        </Router>
+      );
+    };
+    ```
+
+- On `Profile.js`
+
+  - ```jsx
+    import { useNavigate } from 'react-router-dom';
+    import { getAuth, signOut } from 'firebase/auth';
+
+    const Profile = () => {
+      const auth = getAuth();
+      const navigate = useNavigate();
+      const onLogOutClick = async () => {
+        try {
+          await signOut(auth);
+          navigate('/');
+        } catch (err) {
+          console.log(err);
+        }
+      };
+      return <button onClick={onLogOutClick}>Log Out</button>;
+    };
+    ```
