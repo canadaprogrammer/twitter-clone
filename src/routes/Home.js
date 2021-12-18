@@ -6,6 +6,16 @@ const Home = () => {
   const [ctwitt, setCtwitt] = useState('');
   const onSubmit = async (evt) => {
     evt.preventDefault();
+    try {
+      const docRef = await addDoc(collection(db, 'ctwitt'), {
+        ctwitt,
+        createdAt: Date.now(),
+      });
+      setCtwitt('');
+      console.log(docRef);
+    } catch (error) {
+      console.log(error);
+    }
   };
   const onChange = (evt) => {
     const {
