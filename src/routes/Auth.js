@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
 import {
-  getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
   GithubAuthProvider,
 } from 'firebase/auth';
+import { auth } from 'fbase';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [newAccount, setNewAccount] = useState(true);
   const [error, setError] = useState('');
-  const auth = getAuth();
   const onChange = (evt) => {
     const {
       target: { name, value },

@@ -370,13 +370,25 @@
 
 - Create Firestore Database on Firebase
 
+- On `fbase.js`
+
+  - ```js
+    import { getAuth } from 'firebase/auth';
+    import { getFirestore } from 'firebase/firestore';
+
+    const app = initializeApp(firebaseConfig);
+
+    export const auth = getAuth();
+    export const db = getFirestore(app);
+    ```
+
 - On `Home.js`
 
   - ```jsx
-    import React, { useState } from 'react';
-    import { getFirestore, collection, addDoc } from 'firebase/firestore';
+    import { collection, addDoc } from 'firebase/firestore';
+    import { auth, db } from 'fbase';
+
     const Home = () => {
-      const db = getFirestore();
       const [ctwitt, setCtwitt] = useState('');
       const onSubmit = async (evt) => {
         evt.preventDefault();
@@ -386,7 +398,6 @@
             createdAt: Date.now(),
           });
           setCtwitt('');
-          console.log(docRef);
         } catch (error) {
           console.log(error);
         }
@@ -412,6 +423,63 @@
         </div>
       );
     };
+    ```
 
-    export default Home;
+## Get the Collection
+
+- Get the collection on `fbase.js`
+
+  - ```js
+    import { getFirestore, collection, getDocs } from 'firebase/firestore';
+
+    const getCtwitts = async (db) => {
+      try {
+        const ctwittsCol = collection(db, 'ctwitt');
+        const ctwittSnapshot = await getDocs(ctwittsCol);
+        const ctwittList = ctwittSnapshot.docs;
+        // create objArray with id
+        let ctwittObjs = [];
+        ctwittList.forEach((document) => {
+          const ctwittObj = {
+            ...document.data(),
+            id: document.id,
+          };
+          ctwittObjs.push(ctwittObj);
+        });
+        return ctwittObjs;
+      } catch (error) {
+        console.log(error);
+        return null;
+      }
+    };
+
+    export const ctwittObjs = getCtwitts(db);
+    ```
+
+- Show the collection on `Home.js`
+
+  - ```jsx
+    import { db, ctwittObjs } from 'fbase';
+
+    const Home = () => {
+      const [ctwitts, setCtwitts] = useState([]);
+      const getCtwitts = async () => {
+        const list = await ctwittObjs;
+        list.forEach((document) => {
+          setCtwitts((prev) => [document, ...prev]);
+        });
+      };
+      useEffect(() => {
+        getCtwitts();
+      }, []);
+      return (
+          {ctwitts.length > 0 ? (
+            <ul>
+              {ctwitts.map((ct) => (
+                <li key={ct.id}>{ct.ctwitt}</li>
+              ))}
+            </ul>
+          ) : null}
+      );
+    };
     ```

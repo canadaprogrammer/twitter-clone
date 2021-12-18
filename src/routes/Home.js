@@ -1,9 +1,21 @@
-import React, { useState } from 'react';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import { collection, addDoc } from 'firebase/firestore';
+
+import { db, ctwittObjs } from 'fbase';
 
 const Home = () => {
-  const db = getFirestore();
   const [ctwitt, setCtwitt] = useState('');
+  const [ctwitts, setCtwitts] = useState([]);
+  const getCtwitts = async () => {
+    const list = await ctwittObjs;
+    console.log(list);
+    list.forEach((document) => {
+      setCtwitts((prev) => [document, ...prev]);
+    });
+  };
+  useEffect(() => {
+    getCtwitts();
+  }, []);
   const onSubmit = async (evt) => {
     evt.preventDefault();
     try {
@@ -35,6 +47,13 @@ const Home = () => {
         />
         <input type='submit' value='Cloning Twitter' onClick={onSubmit} />
       </form>
+      {ctwitts.length > 0 ? (
+        <ul>
+          {ctwitts.map((ct) => (
+            <li key={ct.id}>{ct.ctwitt}</li>
+          ))}
+        </ul>
+      ) : null}
     </div>
   );
 };

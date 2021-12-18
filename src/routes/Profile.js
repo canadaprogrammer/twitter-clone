@@ -1,9 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAuth, signOut } from 'firebase/auth';
+import { signOut } from 'firebase/auth';
+import { auth } from 'fbase';
 
 const Profile = () => {
-  const auth = getAuth();
   const navigate = useNavigate();
   const onLogOutClick = async () => {
     try {
