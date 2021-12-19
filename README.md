@@ -518,3 +518,36 @@
             id: document.id,
             creatorId: userObj.uid,
     ```
+
+## Database Realtime Updates
+
+- On `Home.js`
+
+  - ```jsx
+    import {
+      collection,
+      addDoc,
+      onSnapshot,
+      query,
+      orderBy,
+    } from 'firebase/firestore';
+
+    const Home = ({ userObj }) => {
+      ...
+
+      useEffect(() => {
+        const q = query(collection(db, 'ctwitt'), orderBy('createdAt', 'desc'));
+        onSnapshot(q, (snapshot) => {
+          const ctwittObj = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setCtwitts(ctwittObj);
+        });
+      }, []);
+      ...
+    ```
+
+- Note: How is the data updated real-time even though using `useEffect(() => {},[]);`?
+
+  - It's subscribed only once, but Firebase updates the data in real-time after subscribing.

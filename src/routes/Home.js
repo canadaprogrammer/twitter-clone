@@ -1,32 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { collection, addDoc, getDocs } from 'firebase/firestore';
+import {
+  collection,
+  addDoc,
+  onSnapshot,
+  query,
+  orderBy,
+} from 'firebase/firestore';
 
 import { db } from 'fbase';
 
 const Home = ({ userObj }) => {
-  console.log(userObj);
   const [ctwitt, setCtwitt] = useState('');
   const [ctwitts, setCtwitts] = useState([]);
 
-  const getCtwitts = async () => {
-    try {
-      const ctwittsCol = collection(db, 'ctwitt');
-      const ctwittSnapshot = await getDocs(ctwittsCol);
-      const ctwittList = ctwittSnapshot.docs;
-      // create objArray with id
-      ctwittList.forEach((document) => {
-        const ctwittObj = {
-          ...document.data(),
-          id: document.id,
-        };
-        setCtwitts((prev) => [ctwittObj, ...prev]);
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
   useEffect(() => {
-    getCtwitts();
+    const q = query(collection(db, 'ctwitt'), orderBy('createdAt', 'desc'));
+    onSnapshot(q, (snapshot) => {
+      const ctwittObj = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setCtwitts(ctwittObj);
+    });
   }, []);
   const onSubmit = async (evt) => {
     evt.preventDefault();
