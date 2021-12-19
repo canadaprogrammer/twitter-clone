@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import AppRouter from 'components/Router';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from 'fbase';
 
 function App() {
-  const auth = getAuth();
   const [init, setInit] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   useEffect(() => {
@@ -15,7 +15,7 @@ function App() {
       }
       setInit(true);
     });
-  }, [auth]);
+  }, []);
   return (
     <>
       {init ? <AppRouter isLoggedIn={isLoggedIn} /> : 'Initializing...'}

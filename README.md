@@ -176,20 +176,27 @@
 
 ## Creating a New Account with Email and Password
 
+- On `fbase.js`
+
+  - ```js
+    import { getAuth } from 'firebase/auth';
+
+    export const auth = getAuth();
+    ```
+
 - On `Auth.js`
 
   - ```jsx
     import {
-      getAuth,
       createUserWithEmailAndPassword,
       signInWithEmailAndPassword,
     } from 'firebase/auth';
+    import { auth } from 'fbase';
 
     const Auth = () => {
       ...
       const [newAccount, setNewAccount] = useState(true);
       const [error, setError] = useState('');
-      const auth = getAuth();
       ...
       const onSubmit = async (evt) => {
         evt.preventDefault();
@@ -218,10 +225,10 @@
   - ```jsx
     import React, { useState, useEffect } from 'react';
     import AppRouter from 'components/Router';
-    import { getAuth, onAuthStateChanged } from 'firebase/auth';
+    import { onAuthStateChanged } from 'firebase/auth';
+    import { auth } from 'fbase';
 
     function App() {
-      const auth = getAuth();
       const [init, setInit] = useState(false);
       const [isLoggedIn, setIsLoggedIn] = useState(false);
       useEffect(() => {
@@ -349,10 +356,10 @@
 
   - ```jsx
     import { useNavigate } from 'react-router-dom';
-    import { getAuth, signOut } from 'firebase/auth';
+    import { signOut } from 'firebase/auth';
+    import { auth } from 'fbase';
 
     const Profile = () => {
-      const auth = getAuth();
       const navigate = useNavigate();
       const onLogOutClick = async () => {
         try {
@@ -427,47 +434,27 @@
 
 ## Get the Collection
 
-- Get the collection on `fbase.js`
-
-  - ```js
-    import { getFirestore, collection, getDocs } from 'firebase/firestore';
-
-    const getCtwitts = async (db) => {
-      try {
-        const ctwittsCol = collection(db, 'ctwitt');
-        const ctwittSnapshot = await getDocs(ctwittsCol);
-        const ctwittList = ctwittSnapshot.docs;
-        // create objArray with id
-        let ctwittObjs = [];
-        ctwittList.forEach((document) => {
-          const ctwittObj = {
-            ...document.data(),
-            id: document.id,
-          };
-          ctwittObjs.push(ctwittObj);
-        });
-        return ctwittObjs;
-      } catch (error) {
-        console.log(error);
-        return null;
-      }
-    };
-
-    export const ctwittObjs = getCtwitts(db);
-    ```
-
 - Show the collection on `Home.js`
 
   - ```jsx
-    import { db, ctwittObjs } from 'fbase';
-
     const Home = () => {
       const [ctwitts, setCtwitts] = useState([]);
       const getCtwitts = async () => {
-        const list = await ctwittObjs;
-        list.forEach((document) => {
-          setCtwitts((prev) => [document, ...prev]);
-        });
+        try {
+          const ctwittsCol = collection(db, 'ctwitt');
+          const ctwittSnapshot = await getDocs(ctwittsCol);
+          const ctwittList = ctwittSnapshot.docs;
+          // create objArray with id
+          ctwittList.forEach((document) => {
+            const ctwittObj = {
+              ...document.data(),
+              id: document.id,
+            };
+            setCtwitts((prev) => [ctwittObj, ...prev]);
+          });
+        } catch (error) {
+          console.log(error);
+        }
       };
       useEffect(() => {
         getCtwitts();
