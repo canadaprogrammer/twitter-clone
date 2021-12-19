@@ -6,14 +6,14 @@ import Profile from 'routes/Profile';
 import Navigation from 'components/Navigation';
 
 // eslint-disable-next-line import/no-anonymous-default-export
-const AppRouter = ({ isLoggedIn }) => {
+const AppRouter = ({ isLoggedIn, userObj }) => {
   return (
     <Router>
       {isLoggedIn && <Navigation />}
       <Routes>
         {isLoggedIn ? (
           <Route path='/'>
-            <Route index element={<Home />} />
+            <Route index element={<Home userObj={userObj} />} />
             <Route path='profile' element={<Profile />} />
           </Route>
         ) : (

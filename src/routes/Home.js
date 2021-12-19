@@ -34,6 +34,7 @@ const Home = ({ userObj }) => {
       const docRef = await addDoc(collection(db, 'ctwitt'), {
         ctwitt,
         createdAt: Date.now(),
+        creatorId: userObj.uid,
       });
       setCtwitt('');
       console.log(docRef);

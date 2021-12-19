@@ -470,3 +470,51 @@
       );
     };
     ```
+
+## Save User ID to database for edit
+
+- On `App.js`
+
+  - ```jsx
+    function App() {
+      ...
+      const [userObj, setUserObj] = useState(null);
+      useEffect(() => {
+        onAuthStateChanged(auth, (user) => {
+          if (user) {
+            ...
+            setUserObj(user);
+          } else {
+          ...
+        });
+      }, []);
+      return (
+        <>
+          {init ? (
+            <AppRouter isLoggedIn={isLoggedIn} userObj={userObj} />
+          ) : (
+            'Initializing...'
+          )}
+    ```
+
+- On `Router.js`
+
+  - ```jsx
+    const AppRouter = ({ isLoggedIn, userObj }) => {
+    return (
+      ...
+              <Route index element={<Home userObj={userObj} />} />
+    ```
+
+- On `Home.js`
+
+  - ```jsx
+    const Home = ({ userObj }) => {
+      ...
+    const getCtwitts = async () => {
+      ...
+          const ctwittObj = {
+            ...document.data(),
+            id: document.id,
+            creatorId: userObj.uid,
+    ```
