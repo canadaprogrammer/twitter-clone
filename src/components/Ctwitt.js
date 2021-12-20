@@ -43,14 +43,12 @@ const Ctwitt = ({ ctwittObj, isOwner }) => {
       ) : (
         <>
           {text}
-          {isOwner ? (
+          {isOwner && (
             <>
-              <button onClick={toggleEditing}>
-                {editing ? 'Submit' : 'Edit'}
-              </button>
+              <button onClick={toggleEditing}>Edit</button>
               <button onClick={onClickDelete}>Delete</button>
             </>
-          ) : null}
+          )}
         </>
       )}
     </li>

@@ -478,20 +478,24 @@
   - ```jsx
     function App() {
       ...
+      // const [isLoggedIn, setIsLoggedIn] = useState(false);
       const [userObj, setUserObj] = useState(null);
       useEffect(() => {
         onAuthStateChanged(auth, (user) => {
           if (user) {
-            ...
+            // setIsLoggedIn(true);
             setUserObj(user);
-          } else {
-          ...
+            // } else {
+            // setIsLoggedIn(false);
+          }
+          setInit(true);
         });
       }, []);
       return (
         <>
           {init ? (
-            <AppRouter isLoggedIn={isLoggedIn} userObj={userObj} />
+            // <AppRouter isLoggedIn={isLoggedIn} userObj={userObj} />
+            <AppRouter isLoggedIn={Boolean(userObj)} userObj={userObj} />
           ) : (
             'Initializing...'
           )}
@@ -641,14 +645,12 @@
           ) : (
             <>
               {text}
-              {isOwner ? (
+              {isOwner && (
                 <>
-                  <button onClick={toggleEditing}>
-                    {editing ? 'Submit' : 'Edit'}
-                  </button>
+                  <button onClick={toggleEditing}>Edit</button>
                   <button onClick={onClickDelete}>Delete</button>
                 </>
-              ) : null}
+              )}
             </>
           )}
         </li>
