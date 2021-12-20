@@ -1,6 +1,6 @@
-# Cloning Twitter with Firebase (Web v9)
+# Clone Twitter with Firebase (Web v9)
 
-## Installing Firebase
+## Install Firebase
 
 - `npm i firebase`
 
@@ -25,7 +25,7 @@
 
   - `import './fbase';`
 
-## Securing the Keys
+## Secure the Keys
 
 - Make `.env` to root directory
 
@@ -39,7 +39,7 @@
 
 - Add `.env` to `.gitignore` to hide the Key on Github.
 
-## Setting up Router
+## Set up Router
 
 - Create `Router.js` on \src\components
 
@@ -98,7 +98,7 @@
 
   - Change import path
 
-## Setting Up Firebase Auth
+## Set Up Firebase Auth
 
 - Setting up Firebase Authentication
 
@@ -174,7 +174,7 @@
     export default Auth;
     ```
 
-## Creating a New Account with Email and Password
+## Create a New Account with Email and Password
 
 - On `fbase.js`
 
@@ -521,12 +521,13 @@
 
 ## Database Realtime Updates
 
+### Get Collection
+
 - On `Home.js`
 
-  - ```jsx
+  - ```js
     import {
-      collection,
-      addDoc,
+      ...
       onSnapshot,
       query,
       orderBy,
@@ -534,13 +535,31 @@
 
     const Home = ({ userObj }) => {
       ...
-
+      // const getCtwitts = async () => {
+      //   try {
+      //     const ctwittsCol = collection(db, 'ctwitt');
+      //     const ctwittSnapshot = await getDocs(ctwittsCol);
+      //     const ctwittList = ctwittSnapshot.docs;
+      //     ctwittList.forEach((document) => {
+      //       const ctwittObj = {
+      //         ...document.data(),
+      //         id: document.id,
+      //        creatorId: userObj.uid,
+      //       };
+      //       setCtwitts((prev) => [ctwittObj, ...prev]);
+      //     });
+      //   } catch (error) {
+      //     console.log(error);
+      //   }
+      // };
       useEffect(() => {
+        // getCtwitts();
         const q = query(collection(db, 'ctwitt'), orderBy('createdAt', 'desc'));
         onSnapshot(q, (snapshot) => {
           const ctwittObj = snapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
+            creatorId: userObj.uid,
           }));
           setCtwitts(ctwittObj);
         });
@@ -551,3 +570,90 @@
 - Note: How is the data updated real-time even though using `useEffect(() => {},[]);`?
 
   - It's subscribed only once, but Firebase updates the data in real-time after subscribing.
+
+### Delete and Update Data
+
+- On `Home.js`
+
+  - ```jsx
+    import Ctwitt from 'components/Ctwitt';
+
+      return (
+        ...
+        <ul>
+          {ctwitts.map((ct) => (
+            <Ctwitt
+              key={ct.id}
+              ctwittObj={ct}
+              isOwner={ct.creatorId === userObj.uid}
+            />
+          ))}
+        </ul>
+        ...
+      );
+    ```
+
+- Create `/components/Ctwitt.js`
+
+  - ```jsx
+    import React, { useState } from 'react';
+    import { doc, deleteDoc, updateDoc } from 'firebase/firestore';
+    import { db } from 'fbase';
+
+    const Ctwitt = ({ ctwittObj, isOwner }) => {
+      const [editing, setEditing] = useState(false);
+      const [text, setText] = useState(ctwittObj.text);
+      const onClickDelete = async () => {
+        const ok = window.confirm(`Are you sure to delete ${ctwittObj.text}?`);
+        if (ok) {
+          await deleteDoc(doc(db, 'ctwitt', ctwittObj.id));
+        }
+      };
+      const toggleEditing = () => setEditing((prev) => !prev);
+      const onChangeCtwitt = (evt) => {
+        const {
+          target: { value },
+        } = evt;
+        setText(value);
+      };
+      const onSubmit = async (evt) => {
+        evt.preventDefault();
+        await updateDoc(doc(db, 'ctwitt', ctwittObj.id), {
+          text,
+        });
+        setEditing(false);
+      };
+      return (
+        <li>
+          {editing ? (
+            <>
+              <form onSubmit={onSubmit}>
+                <input
+                  type='text'
+                  value={text}
+                  onChange={onChangeCtwitt}
+                  required
+                />
+                <input type='submit' value='Update Ctwitt' />
+              </form>
+              <button onClick={toggleEditing}>Cancel</button>
+            </>
+          ) : (
+            <>
+              {text}
+              {isOwner ? (
+                <>
+                  <button onClick={toggleEditing}>
+                    {editing ? 'Submit' : 'Edit'}
+                  </button>
+                  <button onClick={onClickDelete}>Delete</button>
+                </>
+              ) : null}
+            </>
+          )}
+        </li>
+      );
+    };
+
+    export default Ctwitt;
+    ```

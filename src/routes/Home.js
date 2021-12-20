@@ -6,11 +6,11 @@ import {
   query,
   orderBy,
 } from 'firebase/firestore';
-
 import { db } from 'fbase';
+import Ctwitt from 'components/Ctwitt';
 
 const Home = ({ userObj }) => {
-  const [ctwitt, setCtwitt] = useState('');
+  const [text, setText] = useState('');
   const [ctwitts, setCtwitts] = useState([]);
 
   useEffect(() => {
@@ -26,13 +26,12 @@ const Home = ({ userObj }) => {
   const onSubmit = async (evt) => {
     evt.preventDefault();
     try {
-      const docRef = await addDoc(collection(db, 'ctwitt'), {
-        ctwitt,
+      await addDoc(collection(db, 'ctwitt'), {
+        text,
         createdAt: Date.now(),
         creatorId: userObj.uid,
       });
-      setCtwitt('');
-      console.log(docRef);
+      setText('');
     } catch (error) {
       console.log(error);
     }
@@ -41,13 +40,13 @@ const Home = ({ userObj }) => {
     const {
       target: { value },
     } = evt;
-    setCtwitt(value);
+    setText(value);
   };
   return (
     <div>
       <form>
         <input
-          value={ctwitt}
+          value={text}
           onChange={onChange}
           type='text'
           placeholder="What's on your mind?"
@@ -55,13 +54,15 @@ const Home = ({ userObj }) => {
         />
         <input type='submit' value='Cloning Twitter' onClick={onSubmit} />
       </form>
-      {ctwitts.length > 0 ? (
-        <ul>
-          {ctwitts.map((ct) => (
-            <li key={ct.id}>{ct.ctwitt}</li>
-          ))}
-        </ul>
-      ) : null}
+      <ul>
+        {ctwitts.map((ct) => (
+          <Ctwitt
+            key={ct.id}
+            ctwittObj={ct}
+            isOwner={ct.creatorId === userObj.uid}
+          />
+        ))}
+      </ul>
     </div>
   );
 };
