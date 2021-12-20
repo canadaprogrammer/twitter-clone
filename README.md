@@ -660,7 +660,7 @@
     export default Ctwitt;
     ```
 
-## Preview Images
+## Preview Image
 
 - `FileReader`
 
@@ -708,4 +708,30 @@
         ...
       </div>
     );
+    ```
+
+## Upload image
+
+- To create a random Universally Unique Identifier(UUID), `npm i uuid`
+
+- On `fbase.js`
+
+  - ```js
+    import { getStorage } from 'firebase/storage';
+
+    export const storage = getStorage(app);
+    ```
+
+- On `Home.js`
+
+  - ```js
+    import { v4 as uuidv4 } from 'uuid';
+    import { ref, uploadString } from 'firebase/storage';
+    import { db, storage } from 'fbase';
+
+    const onSubmit = async (evt) => {
+      evt.preventDefault();
+      const fileRef = ref(storage, `${userObj.uid}/${uuidv4()}`);
+      const response = await uploadString(fileRef, attachment, 'data_url');
+      ...
     ```

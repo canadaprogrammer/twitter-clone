@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import {
   collection,
   addDoc,
@@ -6,7 +7,8 @@ import {
   query,
   orderBy,
 } from 'firebase/firestore';
-import { db } from 'fbase';
+import { ref, uploadString } from 'firebase/storage';
+import { db, storage } from 'fbase';
 import Ctwitt from 'components/Ctwitt';
 
 const Home = ({ userObj }) => {
@@ -25,16 +27,19 @@ const Home = ({ userObj }) => {
   }, []);
   const onSubmit = async (evt) => {
     evt.preventDefault();
-    try {
-      await addDoc(collection(db, 'ctwitt'), {
-        text,
-        createdAt: Date.now(),
-        creatorId: userObj.uid,
-      });
-      setText('');
-    } catch (error) {
-      console.log(error);
-    }
+    const fileRef = ref(storage, `${userObj.uid}/${uuidv4()}`);
+    const response = await uploadString(fileRef, attachment, 'data_url');
+    console.log(response);
+    // try {
+    //   await addDoc(collection(db, 'ctwitt'), {
+    //     text,
+    //     createdAt: Date.now(),
+    //     creatorId: userObj.uid,
+    //   });
+    //   setText('');
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
   const onChange = (evt) => {
     const {
