@@ -659,3 +659,53 @@
 
     export default Ctwitt;
     ```
+
+## Preview Images
+
+- `FileReader`
+
+  - The `FileReader` object lets web applications synchronously read the contents of files (or raw data buffers) stored on the user's computer, using `File` or `Blob` objects to specify the file or data to read.
+
+- On `Home.js`
+
+  - ```jsx
+    const onChangeFile = (evt) => {
+      const {
+        target: { files },
+      } = evt;
+      const theFile = files[0];
+      const reader = new FileReader();
+      reader.onloadend = (finishedEvent) => {
+        const {
+          currentTarget: { result },
+        } = finishedEvent;
+        setAttachment(result);
+      };
+      reader.readAsDataURL(theFile);
+    };
+    const onClickClearAttachment = (evt) => {
+      evt.preventDefault();
+      setAttachment(null);
+    };
+    return (
+      <div>
+        <form>
+          ...
+          <input type='file' accept='image/*' onChange={onChangeFile} />
+          <input type='submit' value='Cloning Twitter' onClick={onSubmit} />
+          {attachment && (
+            <div>
+              <img
+                src={attachment}
+                alt='attached file'
+                width='100px'
+                height='50px'
+              />
+              <button onClick={onClickClearAttachment}>Clear</button>
+            </div>
+          )}
+        </form>
+        ...
+      </div>
+    );
+    ```

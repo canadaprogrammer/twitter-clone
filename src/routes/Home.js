@@ -12,7 +12,7 @@ import Ctwitt from 'components/Ctwitt';
 const Home = ({ userObj }) => {
   const [text, setText] = useState('');
   const [ctwitts, setCtwitts] = useState([]);
-
+  const [attachment, setAttachment] = useState(null);
   useEffect(() => {
     const q = query(collection(db, 'ctwitt'), orderBy('createdAt', 'desc'));
     onSnapshot(q, (snapshot) => {
@@ -42,6 +42,24 @@ const Home = ({ userObj }) => {
     } = evt;
     setText(value);
   };
+  const onChangeFile = (evt) => {
+    const {
+      target: { files },
+    } = evt;
+    const theFile = files[0];
+    const reader = new FileReader();
+    reader.onloadend = (finishedEvent) => {
+      const {
+        currentTarget: { result },
+      } = finishedEvent;
+      setAttachment(result);
+    };
+    reader.readAsDataURL(theFile);
+  };
+  const onClickClearAttachment = (evt) => {
+    evt.preventDefault();
+    setAttachment(null);
+  };
   return (
     <div>
       <form>
@@ -52,7 +70,14 @@ const Home = ({ userObj }) => {
           placeholder="What's on your mind?"
           maxLength={120}
         />
+        <input type='file' accept='image/*' onChange={onChangeFile} />
         <input type='submit' value='Cloning Twitter' onClick={onSubmit} />
+        {attachment && (
+          <div>
+            <img src={attachment} alt='attached' width='100px' height='50px' />
+            <button onClick={onClickClearAttachment}>Clear</button>
+          </div>
+        )}
       </form>
       <ul>
         {ctwitts.map((ct) => (
