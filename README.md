@@ -479,7 +479,7 @@
     function App() {
       ...
       // const [isLoggedIn, setIsLoggedIn] = useState(false);
-      const [userObj, setUserObj] = useState('');
+      const [userObj, setUserObj] = useState(null);
       useEffect(() => {
         onAuthStateChanged(auth, (user) => {
           if (user) {
@@ -487,6 +487,8 @@
             setUserObj(user);
             // } else {
             // setIsLoggedIn(false);
+          } else {
+            setUserObj(null)
           }
           setInit(true);
         });
@@ -523,7 +525,7 @@
             creatorId: userObj.uid,
     ```
 
-## Database Realtime Updates
+## Database Realtime Updates from Firestore
 
 ### Get Collection
 
@@ -710,7 +712,7 @@
     );
     ```
 
-## Upload image
+## Upload File to Storage
 
 - To create a random Universally Unique Identifier(UUID), `npm i uuid`
 
@@ -738,7 +740,7 @@
       ...
     ```
 
-## Show Uploaded Image
+## Get Uploaded File from Storage
 
 - On `Home.js`
 
@@ -780,7 +782,7 @@
     }
     ```
 
-## Delete Uploaded Image
+## Delete Uploaded File from Storage
 
 - On `Ctwitt.js`
 
@@ -797,3 +799,158 @@
       }
     };
     ```
+
+## Edit Profile
+
+- On `Router.js`
+
+  - ```jsx
+    <Router>
+      {isLoggedIn && <Navigation userObj={userObj} />}
+      ...
+            <Route path='profile' element={<Profile userObj={userObj} />} />
+    ```
+
+- On `Navigation.js`
+
+  - ```jsx
+
+    ```
+
+    const Navigation = ({ userObj }) => (
+    ...
+    <Link to='/profile'>{userObj.displayName}'s Profile</Link>
+
+    ```
+
+    ```
+
+- On `Profile.js`
+
+  - ```jsx
+    import React, { ..., useState } from 'react';
+    import { ..., updateProfile } from 'firebase/auth';
+    import { ..., db } from 'fbase';
+    import { ..., collection, query, where, orderBy } from 'firebase/firestore';
+
+    const Profile = ({ userObj }) => {
+      const [newName, setNewName] = useState(userObj.displayName);
+      ...
+      const getMyCtwitts = async () => {
+        const q = query(
+          collection(db, 'ctwitt'),
+          where('creatorId', '==', userObj.uid),
+          orderBy('createdAt', 'desc')
+        );
+        const ctwitts = await getDocs(q);
+        console.log(ctwitts.docs.map((doc) => doc.data()));
+      };
+      useEffect(() => {
+        getMyCtwitts();
+      }, []);
+      const onChange = (evt) => {
+        const {
+          target: { value },
+        } = evt;
+        setNewName(value);
+      };
+      const onSubmit = async (evt) => {
+        evt.preventDefault();
+        if (userObj.displayName !== newName) {
+          await updateProfile(userObj, { displayName: newName });
+        }
+      };
+      return (
+        <>
+          <form>
+            <input
+              type='text'
+              placeholder='display name'
+              onChange={onChange}
+              value={newName}
+            />
+            <input type='submit' onClick={onSubmit} />
+          </form>
+          <button onClick={onLogOutClick}>Log Out</button>
+        </>
+      );
+    };
+    ```
+
+- `FirebaseError: The query requires an index.`
+
+  - Cloud Firestore uses composite indexes for compound queries not already supported by single field indexes (ex: combining equality and range operators).
+
+  - If you change the compound queries, you need to create an index for the changed one.
+
+  - Click the link on the error notice and create an index.
+
+### Update DisplayName Realtime
+
+- Refresh `userObj` when it's updated
+
+- On `App.js`
+
+  - ```jsx
+    const refreshUserName = () => {
+      setUserObj(auth.currentUser)
+    }
+    ...
+          <AppRouter refreshUserName={refreshUserName} isLoggedIn={Boolean(userObj)} userObj={userObj} />
+    ```
+
+- On `Router.js`
+
+  - ```jsx
+    const AppRouter = ({ refreshUserName, ... }) => {
+      ...
+                <Route
+                  path='profile'
+                  element={<Profile userObj={userObj} refreshUserName={refreshUserName} />}
+    ```
+
+- On `Profile.js`
+
+  - ```jsx
+    const Profile = ({ ..., refreshUserName }) => {
+      ...
+      const onSubmit = async (evt) => {
+        ...
+        refreshUserName();
+      };
+    ```
+
+#### Issue: When the new object are pointing to the same reference with the old object, React is not going to update the state.
+
+- Solution 1: Save the User to a new reference.
+
+  - On `App.js`
+
+    - ```jsx
+      const refreshUserName = () => {
+        setUserObj({ ...auth.currentUser });
+      };
+      ```
+
+  - Issue: getIdToken is not function
+
+    - On `Profile.js`
+
+      - ```jsx
+        if (userObj.displayName !== newName) {
+          await updateProfile(auth.currentUser, { displayName: newName });
+        }
+        ```
+
+- Solution 2: Set displayName as a new state
+
+  - On `App.js`
+
+    - ```jsx
+      const [newUserName, setNewUserName] = useState('');
+
+      const refreshUserName = () => {
+        const user = auth.currentUser;
+        setNewUserName(user.displayName);
+      };
+      ```

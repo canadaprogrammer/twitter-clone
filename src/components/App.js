@@ -6,18 +6,30 @@ import { auth } from 'fbase';
 function App() {
   const [init, setInit] = useState(false);
   const [userObj, setUserObj] = useState(null);
+  // const [newUserName, setNewUserName] = useState('');
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setUserObj(user);
+      } else {
+        setUserObj(null);
       }
       setInit(true);
     });
   }, []);
+  const refreshUserName = () => {
+    // const user = auth.currentUser;
+    // setNewUserName(user.displayName);
+    setUserObj({ ...auth.currentUser });
+  };
   return (
     <>
       {init ? (
-        <AppRouter isLoggedIn={Boolean(userObj)} userObj={userObj} />
+        <AppRouter
+          refreshUserName={refreshUserName}
+          isLoggedIn={Boolean(userObj)}
+          userObj={userObj}
+        />
       ) : (
         'Initializing...'
       )}
