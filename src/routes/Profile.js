@@ -15,18 +15,18 @@ const Profile = ({ userObj, refreshUserName }) => {
       console.log(err);
     }
   };
-  const getMyCtwitts = async () => {
-    const q = query(
-      collection(db, 'ctwitt'),
-      where('creatorId', '==', userObj.uid),
-      orderBy('createdAt', 'desc')
-    );
-    const ctwitts = await getDocs(q);
-    console.log(ctwitts.docs.map((doc) => doc.data()));
-  };
   useEffect(() => {
+    const getMyCtwitts = async () => {
+      const q = query(
+        collection(db, 'ctwitt'),
+        where('creatorId', '==', userObj.uid),
+        orderBy('createdAt', 'desc')
+      );
+      const ctwitts = await getDocs(q);
+      console.log(ctwitts.docs.map((doc) => doc.data()));
+    };
     getMyCtwitts();
-  }, []);
+  }, [userObj.uid]);
   const onChange = (evt) => {
     const {
       target: { value },
