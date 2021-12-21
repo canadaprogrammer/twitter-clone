@@ -5,7 +5,7 @@ import { auth, db } from 'fbase';
 import { getDocs, collection, query, where, orderBy } from 'firebase/firestore';
 
 const Profile = ({ userObj, refreshUserName }) => {
-  const [newName, setNewName] = useState(userObj.displayName);
+  const [newName, setNewName] = useState(userObj.displayName ?? 'Anonymous');
   const navigate = useNavigate();
   const onLogOutClick = async () => {
     try {

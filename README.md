@@ -954,3 +954,182 @@
         setNewUserName(user.displayName);
       };
       ```
+
+## Clean Code
+
+### Refactoring ctwitt form on `Home.js`
+
+- Move the ctwitt form from `Home.js` to `CtwittFactory.js`
+
+  - ```jsx
+    import React, { useState } from 'react';
+    import { v4 as uuidv4 } from 'uuid';
+    import { collection, addDoc } from 'firebase/firestore';
+    import { ref, uploadString, getDownloadURL } from 'firebase/storage';
+    import { db, storage } from 'fbase';
+
+    const CtwittFactory = ({ userObj }) => {
+      const [text, setText] = useState('');
+      const [attachment, setAttachment] = useState('');
+      const onSubmit = async (evt) => {
+        evt.preventDefault();
+        let attachmentURL = '';
+        if (attachment !== '') {
+          const attachmentRef = ref(storage, `${userObj.uid}/${uuidv4()}`);
+          const response = await uploadString(
+            attachmentRef,
+            attachment,
+            'data_url'
+          );
+          attachmentURL = await getDownloadURL(response.ref);
+        }
+        await addDoc(collection(db, 'ctwitt'), {
+          text,
+          createdAt: Date.now(),
+          creatorId: userObj.uid,
+          attachmentURL,
+        });
+        setText('');
+        setAttachment('');
+        const inputFile = document.querySelector('input[type="file"]');
+        inputFile.value = '';
+      };
+      const onChange = (evt) => {
+        const {
+          target: { value },
+        } = evt;
+        setText(value);
+      };
+      const onChangeFile = (evt) => {
+        const {
+          target: { files },
+        } = evt;
+        const theFile = files[0];
+        const reader = new FileReader();
+        reader.onloadend = (finishedEvent) => {
+          const {
+            currentTarget: { result },
+          } = finishedEvent;
+          setAttachment(result);
+        };
+        reader.readAsDataURL(theFile);
+      };
+      const onClickClearAttachment = (evt) => {
+        evt.preventDefault();
+        setAttachment('');
+      };
+      return (
+        <form>
+          <input
+            value={text}
+            onChange={onChange}
+            type='text'
+            placeholder="What's on your mind?"
+            maxLength={120}
+          />
+          <input type='file' accept='image/*' onChange={onChangeFile} />
+          <input type='submit' value='Cloning Twitter' onClick={onSubmit} />
+          {attachment && (
+            <div>
+              <img
+                src={attachment}
+                alt='attached'
+                width='100px'
+                height='50px'
+              />
+              <button onClick={onClickClearAttachment}>Clear</button>
+            </div>
+          )}
+        </form>
+      );
+    };
+
+    export default CtwittFactory;
+    ```
+
+### Refactoring Log In Form with Email and Password
+
+- Move the form from `Auth.js` to `AuthForm.js`
+
+  - ```jsx
+    import React, { useState } from 'react';
+    import {
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+    } from 'firebase/auth';
+    import { auth } from 'fbase';
+
+    const AuthForm = () => {
+      const [email, setEmail] = useState('');
+      const [password, setPassword] = useState('');
+      const [newAccount, setNewAccount] = useState(true);
+      const [error, setError] = useState('');
+      const onChange = (evt) => {
+        const {
+          target: { name, value },
+        } = evt;
+        if (name === 'email') {
+          setEmail(value);
+        } else if (name === 'password') {
+          setPassword(value);
+        }
+      };
+      const onSubmit = async (evt) => {
+        evt.preventDefault();
+        try {
+          let data;
+          if (newAccount) {
+            data = await createUserWithEmailAndPassword(auth, email, password);
+          } else {
+            data = await signInWithEmailAndPassword(auth, email, password);
+          }
+          console.log(data);
+        } catch (err) {
+          setError(err.message);
+        }
+      };
+      const toggleAccount = () => setNewAccount((prev) => !prev);
+      return (
+        <>
+          <form onSubmit={onSubmit}>
+            <input
+              name='email'
+              type='text'
+              placeholder='Email'
+              required
+              value={email}
+              onChange={onChange}
+            />
+            <input
+              name='password'
+              type='password'
+              placeholder='Password'
+              required
+              value={password}
+              onChange={onChange}
+            />
+            <input
+              type='submit'
+              value={newAccount ? 'Create Account' : 'Sign In'}
+            />
+            {error}
+          </form>
+          <span onClick={toggleAccount}>
+            {newAccount ? 'Sign In' : 'Create Account'}
+          </span>
+        </>
+      );
+    };
+
+    export default AuthForm;
+    ```
+
+### Fix Null displayName
+
+- On `Navigation.js`
+
+  - `<Link to='/profile'>{userObj.displayName ?? 'Anonymous'}'s Profile</Link>`
+
+- On `Profile.js`
+
+  - `const [newName, setNewName] = useState(userObj.displayName ?? 'Anonymous');`
