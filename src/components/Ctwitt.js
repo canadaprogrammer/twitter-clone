@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { doc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { db } from 'fbase';
+import { deleteObject, ref } from 'firebase/storage';
+import { db, storage } from 'fbase';
 
 const Ctwitt = ({ ctwittObj, isOwner }) => {
   const [editing, setEditing] = useState(false);
@@ -9,6 +10,10 @@ const Ctwitt = ({ ctwittObj, isOwner }) => {
     const ok = window.confirm(`Are you sure to delete ${ctwittObj.text}?`);
     if (ok) {
       await deleteDoc(doc(db, 'ctwitt', ctwittObj.id));
+      if (ctwittObj.attachmentURL !== '') {
+        const attachmentRef = ref(storage, ctwittObj.attachmentURL);
+        await deleteObject(attachmentRef);
+      }
     }
   };
   const toggleEditing = () => setEditing((prev) => !prev);

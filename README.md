@@ -765,6 +765,8 @@
       });
       setText('');
       setAttachment('');
+      const inputFile = document.querySelector('input[type="file"]');
+      inputFile.value = '';
     };
     ```
 
@@ -776,4 +778,22 @@
         <img src={ctwittObj.attachmentURL} width='100px' height='50px' alt='' />
       );
     }
+    ```
+
+## Delete Uploaded Image
+
+- On `Ctwitt.js`
+
+  - ```jsx
+    import { deleteObject, ref } from 'firebase/storage';
+    import { db, storage } from 'fbase';
+
+    const onClickDelete = async () => {
+      ...
+        if (ctwittObj.attachmentURL !== '') {
+          const attachmentRef = ref(storage, ctwittObj.attachmentURL);
+          await deleteObject(attachmentRef);
+        }
+      }
+    };
     ```

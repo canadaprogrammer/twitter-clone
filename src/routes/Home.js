@@ -45,6 +45,8 @@ const Home = ({ userObj }) => {
     });
     setText('');
     setAttachment('');
+    const inputFile = document.querySelector('input[type="file"]');
+    inputFile.value = '';
   };
   const onChange = (evt) => {
     const {
