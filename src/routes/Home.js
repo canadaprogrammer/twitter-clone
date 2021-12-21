@@ -7,14 +7,14 @@ import {
   query,
   orderBy,
 } from 'firebase/firestore';
-import { ref, uploadString } from 'firebase/storage';
+import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { db, storage } from 'fbase';
 import Ctwitt from 'components/Ctwitt';
 
 const Home = ({ userObj }) => {
   const [text, setText] = useState('');
   const [ctwitts, setCtwitts] = useState([]);
-  const [attachment, setAttachment] = useState(null);
+  const [attachment, setAttachment] = useState('');
   useEffect(() => {
     const q = query(collection(db, 'ctwitt'), orderBy('createdAt', 'desc'));
     onSnapshot(q, (snapshot) => {
@@ -27,19 +27,24 @@ const Home = ({ userObj }) => {
   }, []);
   const onSubmit = async (evt) => {
     evt.preventDefault();
-    const fileRef = ref(storage, `${userObj.uid}/${uuidv4()}`);
-    const response = await uploadString(fileRef, attachment, 'data_url');
-    console.log(response);
-    // try {
-    //   await addDoc(collection(db, 'ctwitt'), {
-    //     text,
-    //     createdAt: Date.now(),
-    //     creatorId: userObj.uid,
-    //   });
-    //   setText('');
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    let attachmentURL = '';
+    if (attachment !== '') {
+      const attachmentRef = ref(storage, `${userObj.uid}/${uuidv4()}`);
+      const response = await uploadString(
+        attachmentRef,
+        attachment,
+        'data_url'
+      );
+      attachmentURL = await getDownloadURL(response.ref);
+    }
+    await addDoc(collection(db, 'ctwitt'), {
+      text,
+      createdAt: Date.now(),
+      creatorId: userObj.uid,
+      attachmentURL,
+    });
+    setText('');
+    setAttachment('');
   };
   const onChange = (evt) => {
     const {
@@ -63,7 +68,7 @@ const Home = ({ userObj }) => {
   };
   const onClickClearAttachment = (evt) => {
     evt.preventDefault();
-    setAttachment(null);
+    setAttachment('');
   };
   return (
     <div>

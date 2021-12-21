@@ -479,7 +479,7 @@
     function App() {
       ...
       // const [isLoggedIn, setIsLoggedIn] = useState(false);
-      const [userObj, setUserObj] = useState(null);
+      const [userObj, setUserObj] = useState('');
       useEffect(() => {
         onAuthStateChanged(auth, (user) => {
           if (user) {
@@ -685,7 +685,7 @@
     };
     const onClickClearAttachment = (evt) => {
       evt.preventDefault();
-      setAttachment(null);
+      setAttachment('');
     };
     return (
       <div>
@@ -714,6 +714,8 @@
 
 - To create a random Universally Unique Identifier(UUID), `npm i uuid`
 
+- `uploadString()` returns an `UploadTask` which you can use as a promise, or use to manage and monitor the status of the upload.
+
 - On `fbase.js`
 
   - ```js
@@ -734,4 +736,44 @@
       const fileRef = ref(storage, `${userObj.uid}/${uuidv4()}`);
       const response = await uploadString(fileRef, attachment, 'data_url');
       ...
+    ```
+
+## Show Uploaded Image
+
+- On `Home.js`
+
+  - ```jsx
+    import { ref, uploadString, getDownloadURL } from 'firebase/storage';
+
+    const onSubmit = async (evt) => {
+      evt.preventDefault();
+      let attachmentURL = '';
+      if (attachment !== '') {
+        const attachmentRef = ref(storage, `${userObj.uid}/${uuidv4()}`);
+        const response = await uploadString(
+          attachmentRef,
+          attachment,
+          'data_url'
+        );
+        attachmentURL = await getDownloadURL(response.ref);
+      }
+      await addDoc(collection(db, 'ctwitt'), {
+        text,
+        createdAt: Date.now(),
+        creatorId: userObj.uid,
+        attachmentURL,
+      });
+      setText('');
+      setAttachment('');
+    };
+    ```
+
+- On `Ctwitt.js`
+
+  - ```jsx
+    {
+      ctwittObj.attachmentURL && (
+        <img src={ctwittObj.attachmentURL} width='100px' height='50px' alt='' />
+      );
+    }
     ```

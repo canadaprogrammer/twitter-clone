@@ -43,6 +43,14 @@ const Ctwitt = ({ ctwittObj, isOwner }) => {
       ) : (
         <>
           {text}
+          {ctwittObj.attachmentURL && (
+            <img
+              src={ctwittObj.attachmentURL}
+              width='100px'
+              height='50px'
+              alt=''
+            />
+          )}
           {isOwner && (
             <>
               <button onClick={toggleEditing}>Edit</button>
