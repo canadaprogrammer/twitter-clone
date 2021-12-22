@@ -1133,3 +1133,185 @@
 - On `Profile.js`
 
   - `const [newName, setNewName] = useState(userObj.displayName ?? 'Anonymous');`
+
+## Styles
+
+- Created `src\styles.css`
+
+  - On `index.js`, put `import 'styles.css';`
+
+- Sign In or Up Switch animation
+
+  - On `AuthForm.js`
+
+    - ```jsx
+      const [signInActive, setSignInActive] = useState(false);
+      ...
+      const onClickSwitch = (evt) => {
+        const {target: {name}} = evt;
+        if(name === 'signIn') {
+          setNewAccount(false);
+          setSignInActive(true);
+        }
+        if(name === 'signUp') {
+          setNewAccount(true);
+          setSignInActive(false);
+        }
+      }
+      ...
+          <div className="authSwitch">
+            <button onClick={onClickSwitch} name="signIn" className={signInActive ? 'activeSwitch' : ''}>Sign In</button>
+            <button onClick={onClickSwitch} name="signUp" className={!signInActive ? 'activeSwitch' : ''}>Sign Up</button>
+          </div>
+      ```
+
+  - On `styles.css`
+
+    - ```css
+      .authSwitch {
+        margin-bottom: 2rem;
+        background-color: rgb(41, 41, 41);
+        border-radius: var(--border-radius);
+        z-index: 1;
+        position: relative;
+        width: 170px;
+        display: flex;
+        justify-content: space-between;
+      }
+      .authSwitch button {
+        padding: var(--btn-padding);
+        background-color: transparent;
+        color: white;
+        border: none;
+      }
+      @keyframes switch {
+        from {
+          left: 0;
+          right: 100%;
+        }
+        to {
+          left: 50%;
+          right: 0;
+        }
+      }
+      .authSwitch button.activeSwitch::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        background-color: var(--blue);
+        width: 50%;
+        border-radius: var(--border-radius);
+        z-index: -1;
+        animation-name: switch;
+        animation-duration: 0.4s;
+        animation-fill-mode: forwards;
+        animation-timing-function: ease-in;
+      }
+      .authSwitch button[name='signIn'].activeSwitch::after {
+        animation-direction: reverse;
+      }
+      .authSwitch button:hover:not(.activeSwitch) {
+        font-weight: bold;
+      }
+      ```
+
+### FontAwesome V5
+
+- Install `fontawesome v5`
+
+  - ```bash
+    npm i @fortawesome/fontawesome-svg-core
+    npm i @fortawesome/free-solid-svg-icons @fortawesome/free-brands-svg-icons @fortawesome/free-regular-svg-icons
+    npm i @fortawesome/react-fontawesome
+    ```
+
+- Use the Icon
+
+  - ```jsx
+    import { ICON-NAME } from '@fortawesome/ICON-TYPE';
+
+    <FontAwesomeIcon icon={ICON-NAME} />
+    ```
+
+- via Global Use, `library.add()`
+
+  - ```jsx
+    import ReactDOM from 'react-dom';
+    import { library } from '@fortawesome/fontawesome-svg-core';
+    import { fab } from '@fortawesome/free-brands-svg-icons';
+    import { faCheckSquare, faCoffee } from '@fortawesome/free-solid-svg-icons';
+
+    library.add(fab, faCheckSquare, faCoffee);
+    ```
+
+  - it's passing
+
+    - `fab`: which represents all of the brand icons in `@fortawesome/free-brands-svg-icons`. So any of the brand icons in that package may be referenced by icon name as a string anywhere else in our app. For example: `apple`, `microsoft`, or `google`.
+
+    - `faCheckSquare` and `faCoffee`: Adding each of these icons individually allows us to refer to them throughout our app by their icon string names, `check-square` and `coffee`, respectively.
+
+  - examples
+
+    - ```jsx
+      import React from 'react';
+      import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+      <FontAwesomeIcon icon={['fab', 'apple']} />
+      <FontAwesomeIcon icon="check-square" />
+      ```
+
+- Features
+
+  - size: `<FontAwesomeIcon icon="coffee" size="2x" />`
+
+  - rotation: `<FontAwesomeIcon icon="coffee" rotation={90} />`
+
+  - flip(horizontal, vertical, both): `<FontAwesomeIcon icon="coffee" flip="horizontal" />`
+
+  - pull(left, right): `<FontAwesomeIcon icon="coffee" pull="left" />`
+
+  - transform
+
+    - ```jsx
+      <FontAwesomeIcon icon="coffee" transform="shrink-6 left-4" />
+      <FontAwesomeIcon icon="coffee" transform={{ rotate: 42 }} />
+      ```
+
+  - mask: `<FontAwesomeIcon icon="coffee" mask={['far', 'circle']} />`
+
+  - `fixedWidth`, `inverse`, `listItem`, `spin`, `pulse`, `border`,
+
+  - Layering Icons
+
+    - ```jsx
+      <span className="fa-layers fa-fw">
+        <FontAwesomeIcon icon="square" color="green" />
+        <FontAwesomeIcon icon="check" inverse transform="shrink-6" />
+      </span>
+
+      <span class="fa-layers fa-fw" style="background:MistyRose">
+        <i class="fas fa-play" data-fa-transform="rotate--90 grow-2"></i>
+        <i class="fas fa-sun fa-inverse" data-fa-transform="shrink-10 up-2"></i>
+        <i class="fas fa-moon fa-inverse" data-fa-transform="shrink-11 down-4.2 left-4"></i>
+        <i class="fas fa-star fa-inverse" data-fa-transform="shrink-11 down-4.2 right-4"></i>
+      </span>
+
+      <span class="fa-layers fa-fw" style="background:MistyRose">
+        <i class="fas fa-certificate"></i>
+        <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-11.5 rotate--30" style="font-weight:900">NEW</span>
+      </span>
+
+      <span class="fa-layers fa-fw" style="background:MistyRose">
+        <i class="fas fa-envelope"></i>
+        <span class="fa-layers-counter" style="background:Tomato">1,419</span>
+      </span>
+      ```
+
+- The results
+
+  <img src="./resources/images/auth_page.png" alt="Auth Page" title="Auth Page" width="400" height="auto" />
+  <img src="./resources/images/auth_page-1.png" alt="Auth Pag with Error Message" title="Auth Page with Error Message" width="400" height="auto" />
+  <img src="./resources/images/home_page.png" alt="Home Page" title="Home Page" width="400" height="auto" />
+  <img src="./resources/images/home_page-1.png" alt="Home Page with Add Photo" title="Home Page with Add Photo" width="400" height="auto" />
+  <img src="./resources/images/profile_page.png" alt="Profile Page" title="Profile Page" width="400" height="auto" />

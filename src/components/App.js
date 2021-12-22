@@ -23,7 +23,7 @@ function App() {
     setUserObj({ ...auth.currentUser });
   };
   return (
-    <>
+    <div className="container">
       {init ? (
         <AppRouter
           refreshUserName={refreshUserName}
@@ -33,8 +33,8 @@ function App() {
       ) : (
         'Initializing...'
       )}
-      <footer>&copy; Cloning Twitter {new Date().getFullYear()}</footer>
-    </>
+      {/* <footer>&copy; Cloning Twitter {new Date().getFullYear()}</footer> */}
+    </div>
   );
 }
 

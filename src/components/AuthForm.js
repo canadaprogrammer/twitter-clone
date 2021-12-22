@@ -7,6 +7,7 @@ const AuthForm = () => {
   const [password, setPassword] = useState('');
   const [newAccount, setNewAccount] = useState(true);
   const [error, setError] = useState('');
+  const [signInActive, setSignInActive] = useState(false);
   const onChange = (evt) => {
     const {
       target: { name, value },
@@ -31,10 +32,22 @@ const AuthForm = () => {
       setError(err.message);
     }
   };
-  const toggleAccount = () => setNewAccount((prev) => !prev);
+  // const toggleAccount = () => setNewAccount((prev) => !prev);
+  const onClickSwitch = (evt) => {
+    const {target: {name}} = evt;
+    if(name === 'signIn') {
+      setNewAccount(false);
+      setSignInActive(true);
+    }
+    if(name === 'signUp') {
+      setNewAccount(true);
+      setSignInActive(false);
+    }
+  }
+
   return (
     <>
-      <form onSubmit={onSubmit}>
+      <form onSubmit={onSubmit} className="authForm">
         <input
           name='email'
           type='text'
@@ -53,13 +66,17 @@ const AuthForm = () => {
         />
         <input
           type='submit'
-          value={newAccount ? 'Create Account' : 'Sign In'}
+          value={newAccount ? 'Create Account' : 'Sign In'} className="btn btnBlue authSubmit"
         />
-        {error}
+        {error && <span className="authError">{error}</span>}
       </form>
-      <span onClick={toggleAccount}>
+      {/* <span onClick={toggleAccount} className="authSwitch">
         {newAccount ? 'Sign In' : 'Create Account'}
-      </span>
+      </span> */}
+      <div className="authSwitch">
+        <button onClick={onClickSwitch} name="signIn" className={signInActive ? 'activeSwitch' : ''}>Sign In</button>
+        <button onClick={onClickSwitch} name="signUp" className={!signInActive ? 'activeSwitch' : ''}>Sign Up</button>
+      </div>
     </>
   )
 }

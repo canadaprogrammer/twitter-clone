@@ -18,7 +18,7 @@ const Home = ({ userObj }) => {
   }, []);
   
   return (
-    <div>
+    <div className="w-100">
       <CtwittFactory userObj={userObj} />
       <ul>
         {ctwitts.map((ct) => (

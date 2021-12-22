@@ -6,6 +6,8 @@ import {
 } from 'firebase/auth';
 import { auth } from 'fbase';
 import AuthForm from 'components/AuthForm';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTwitter, faGoogle, faGithub } from '@fortawesome/free-brands-svg-icons';
 
 const Auth = () => {
   const [error, setError] = useState('');
@@ -26,18 +28,19 @@ const Auth = () => {
     }
   };
   return (
-    <div>
+    <>
+      <FontAwesomeIcon icon={faTwitter} className="twitterIcon" size="3x" />
       <AuthForm />
-      <div>
-        <button onClick={onSocialClick} name='google'>
-          Continue with Google
+      <div className="authSocialContainer">
+        <button onClick={onSocialClick} name='google' className="btn">
+          Continue with Google <FontAwesomeIcon icon={faGoogle} />
         </button>
-        <button onClick={onSocialClick} name='github'>
-          Continue with GitHub
+        <button onClick={onSocialClick} name='github' className="btn">
+          Continue with GitHub <FontAwesomeIcon icon={faGithub} />
         </button>
       </div>
-      {error}
-    </div>
+      {error && <span className="authError">{error}</span>}
+    </>
   );
 };
 export default Auth;

@@ -3,6 +3,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { collection, addDoc } from 'firebase/firestore';
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { db, storage } from 'fbase';
+import { faArrowRight, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const CtwittFactory = ({userObj}) => {
   const [text, setText] = useState('');
@@ -55,23 +57,27 @@ const CtwittFactory = ({userObj}) => {
     setAttachment('');
   };
   return (
-    <form>
-      <input
-        value={text}
-        onChange={onChange}
-        type='text'
-        placeholder="What's on your mind?"
-        maxLength={120}
-      />
-      <input type='file' accept='image/*' onChange={onChangeFile} />
-      <input type='submit' value='Cloning Twitter' onClick={onSubmit} />
+    <>
+      <form className="formAddCtwitt">
+        <input
+          value={text}
+          onChange={onChange}
+          type='text'
+          placeholder="What's on your mind?"
+          maxLength={120} className="inputCtwitt"
+        />
+        <label htmlFor='inputSubmit'><FontAwesomeIcon icon={faArrowRight} className="btnSubmit" /></label>
+        <input type='submit' value='' onClick={onSubmit} className="submitCtwitt" id="inputSubmit" />
+      </form>
+      <label htmlFor="addPhoto" className="btnAddPhoto">Add Photo <FontAwesomeIcon icon={faPlus} /></label>
+      <input type='file' accept='image/*' onChange={onChangeFile} className="addPhoto" id="addPhoto" />
       {attachment && (
-        <div>
-          <img src={attachment} alt='attached' width='100px' height='50px' />
-          <button onClick={onClickClearAttachment}>Clear</button>
+        <div className="imagePreview">
+          <img src={attachment} alt='attached' />
+          <button onClick={onClickClearAttachment} className="btn btnBlue clearBtn">Clear</button>
         </div>
       )}
-    </form>
+    </>
   );
 };
 
