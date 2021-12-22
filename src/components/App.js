@@ -7,6 +7,7 @@ function App() {
   const [init, setInit] = useState(false);
   const [userObj, setUserObj] = useState(null);
   // const [newUserName, setNewUserName] = useState('');
+
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -23,7 +24,7 @@ function App() {
     setUserObj({ ...auth.currentUser });
   };
   return (
-    <div className="container">
+    <div className='container'>
       {init ? (
         <AppRouter
           refreshUserName={refreshUserName}

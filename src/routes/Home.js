@@ -16,9 +16,9 @@ const Home = ({ userObj }) => {
       setCtwitts(ctwittObj);
     });
   }, []);
-  
+
   return (
-    <div className="w-100">
+    <div className='w-100'>
       <CtwittFactory userObj={userObj} />
       <ul>
         {ctwitts.map((ct) => (

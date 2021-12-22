@@ -1315,3 +1315,55 @@
   <img src="./resources/images/home_page.png" alt="Home Page" title="Home Page" width="400" height="auto" />
   <img src="./resources/images/home_page-1.png" alt="Home Page with Add Photo" title="Home Page with Add Photo" width="400" height="auto" />
   <img src="./resources/images/profile_page.png" alt="Profile Page" title="Profile Page" width="400" height="auto" />
+
+## Deploying
+
+- `npm i gh-pages`
+
+- On `package.json`
+
+  - ```json
+    "scripts": {
+      ...
+      "predeploy": "npm run build",
+      "deploy": "gh-pages -d build"
+    },
+    ...
+    "homepage": "https://canadaprogrammer.github.io/twitter-clone"
+    ```
+
+- `npm run deploy`
+
+### Security on Firebase
+
+- Add Domain - / Firebase Console / Authentication / Sign-in method / Authorized domain
+
+  - `canadaprogrammer.github.io`
+
+- Change Cloud Firestore rules - /Firebase Console / Firestore Database / Rules
+
+  - `request.time < timestamp.date(2022, 1, 16);` to `request.auth != null`
+
+  - Click Publish
+
+### API Key Security
+
+- Type `console.cloud.google.com/apis/credentials` on a browser
+
+  - New Project
+
+  - Create Credentials - API key
+
+  - Edit API key
+
+    - Check `HTTP referrers (web sites)`
+
+    - Website restrictions
+
+      - Add an Item
+
+        - `canadaprogrammer.github.io/*`
+
+        - `localhost`
+
+        - `twitter-clone-4cec7.firebaseapp.com/*` from Firebase / Authentication / Sign-in method / Authorized domains

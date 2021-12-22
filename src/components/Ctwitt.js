@@ -72,10 +72,10 @@ const Ctwitt = ({ ctwittObj, isOwner }) => {
             <button type='submit'>
               <FontAwesomeIcon icon={faUpload} />
             </button>
-            <button onClick={toggleEditing}>
-              <FontAwesomeIcon icon={faTimes} />
-            </button>
           </form>
+          <button onClick={toggleEditing}>
+            <FontAwesomeIcon icon={faTimes} />
+          </button>
         </>
       ) : (
         <>
